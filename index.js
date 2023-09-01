@@ -11,56 +11,57 @@ const port = process.env.PORT || 3000;
 // Use body-parser middleware to parse URL-encoded data
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.get("/success.js", (req, res) => {
+  res.set('Content-Type', 'application/javascript');
+  res.sendFile(path.join(__dirname, 'success.js'));
+});
+
+let leetcodetoday = false;
+let codeforcestoday = false;
+let githubtoday = false;
+
+app.get("/data", (req, res) => {
+  console.log("Accessing /data route");
+  const data = {
+    leetcodetoday,
+    codeforcestoday,
+    githubtoday
+  };
+
+  res.json(data);
+});
+
+app.get("/success", (req, res) => {
+  // Serve the success.html file
+  res.sendFile(path.join(__dirname, 'success.html'));
+});
+
+
 
 app.post("/submit", async (req, res) => {
   // Handle the submitted form data here
   const leetcodeProfile = req.body.leetcode;
   const codeforcesProfile = req.body.codeforces;
-  const codechefProfile = req.body.codechef;
   const githubProfile = req.body.github;
   try {
     const leetcode_data = await axios.get(`https://leetcode-api-faisalshohag.vercel.app/${leetcodeProfile}`);
     const codeforces_data = await axios.get(`https://codeforces.com/api/user.status?handle=${codeforcesProfile}&from=1&count=1`);
-    const codechef_data = await axios.get(`https://codechef-api.vercel.app/${codechefProfile}`);
     const github_data = await axios.get(`https://api.github.com/users/${githubProfile}/repos`);
 
     // Leetcode
     const keys = Object.keys(leetcode_data["data"].submissionCalendar);
     const lastKey = keys[keys.length - 1];
     var leetcodeDate = new Date(lastKey * 1000)
-    var leetcoded = leetcodeDate.toLocaleString();
-    const leetcodeObject = new Date(leetcoded);
-    console.log(leetcodeObject);
-    const leetcodetoday = isDateToday(leetcodeObject);
+    leetcodetoday = isDateToday(leetcodeDate);
 
-    // Compare the date parts
-    if (
-      leetcodetoday
-    ) {
-      console.log("The latest date is today.");
-    } else {
-      console.log("The latest date is not today.");
-    }
+    
 
     //codeforces
     var codeforces_submittedat = codeforces_data["data"]["result"][0]["creationTimeSeconds"];
     var myDate = new Date(codeforces_submittedat * 1000);
-    var date = myDate.toLocaleString();
-    const dateObject = new Date(date);
-    console.log(dateObject);
-    const codeforcestoday = isDateToday(dateObject);
+    codeforcestoday = isDateToday(myDate);
 
-    // Compare the date parts
-    if (
-      codeforcestoday
-    ) {
-      console.log("The latest date is today.");
-    } else {
-      console.log("The latest date is not today.");
-    }
-
-    // codechef
-    console.log(codechef_data["data"]["currentRating"]);
+    
 
     //github
     let latestDate = new Date(0); // Initialize with a minimum date
@@ -70,24 +71,17 @@ app.post("/submit", async (req, res) => {
         latestDate = updatedAt;
       }
     }
-    console.log(latestDate);
-    const githubtoday = isDateToday(latestDate);
+    // console.log(latestDate);
+    githubtoday = isDateToday(latestDate);
 
-    // Compare the date parts
-    if (
-      githubtoday
-    ) {
-      console.log("The latest date is today.");
-    } else {
-      console.log("The latest date is not today.");
-    }
+    res.redirect(`/success`);
   } catch (e) {
     console.log(e.message);
     res.status(500).send("An error occured while fetching data.");
   }
 
   // Perform any processing or database storage if needed
-  res.send("Form data received and processed!");
+  
 });
 
 var server = http.createServer(app);
