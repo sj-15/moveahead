@@ -72,6 +72,7 @@ app.post("/submit", async (req, res) => {
       }
     }
     // console.log(latestDate);
+    console.log(latestDate);
     githubtoday = isDateToday(latestDate);
 
     res.redirect(`/success`);

@@ -128,23 +128,24 @@ app.post("/submit", function _callee(req, res) {
           return _context.finish(32);
 
         case 40:
+          console.log(latestDate);
           githubtoday = isDateToday(latestDate);
           res.redirect("/success");
-          _context.next = 48;
+          _context.next = 49;
           break;
 
-        case 44:
-          _context.prev = 44;
+        case 45:
+          _context.prev = 45;
           _context.t1 = _context["catch"](3);
           console.log(_context.t1.message);
           res.status(500).send("An error occured while fetching data.");
 
-        case 48:
+        case 49:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[3, 44], [24, 28, 32, 40], [33,, 35, 39]]);
+  }, null, null, [[3, 45], [24, 28, 32, 40], [33,, 35, 39]]);
 });
 var server = http.createServer(app);
 server.listen(port, "0.0.0.0", function () {

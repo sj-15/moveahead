@@ -2,9 +2,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const leetcodeCheckbox = document.getElementById("leetcode-checkbox");
     const codeforcesCheckbox = document.getElementById("codeforces-checkbox");
     const githubCheckbox = document.getElementById("github-checkbox");
+  
     try {
-        const response = await fetch("/data");
-        console.log(data);
+        const response = await fetch("/data"); // Assuming you've set up a route to fetch the data
+        const data = await response.json();
         
         const { leetcodetoday, codeforcestoday, githubtoday } = data;
     
