@@ -28,7 +28,6 @@ var leetcodetoday = false;
 var codeforcestoday = false;
 var githubtoday = false;
 app.get("/data", function (req, res) {
-  console.log("Accessing /data route");
   var data = {
     leetcodetoday: leetcodetoday,
     codeforcestoday: codeforcestoday,
@@ -86,13 +85,12 @@ app.post("/submit", function _callee(req, res) {
 
           for (_iterator = github_data["data"][Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             item = _step.value;
-            updatedAt = new Date(item.updated_at);
+            updatedAt = new Date(item.pushed_at);
 
             if (updatedAt > latestDate) {
               latestDate = updatedAt;
             }
-          } // console.log(latestDate);
-
+          }
 
           _context.next = 32;
           break;
@@ -128,24 +126,44 @@ app.post("/submit", function _callee(req, res) {
           return _context.finish(32);
 
         case 40:
-          console.log(latestDate);
           githubtoday = isDateToday(latestDate);
           res.redirect("/success");
-          _context.next = 49;
+          _context.next = 48;
           break;
 
-        case 45:
-          _context.prev = 45;
+        case 44:
+          _context.prev = 44;
           _context.t1 = _context["catch"](3);
           console.log(_context.t1.message);
           res.status(500).send("An error occured while fetching data.");
 
-        case 49:
+        case 48:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[3, 45], [24, 28, 32, 40], [33,, 35, 39]]);
+  }, null, null, [[3, 44], [24, 28, 32, 40], [33,, 35, 39]]);
+}); // Define your GitHub username
+
+var githubUsername = "sj-15"; // Define the date range for contributions (from and to dates)
+
+var fromDate = "2023-09-02T00:00:00Z";
+var toDate = "2023-09-02T23:59:59Z"; // GitHub API endpoint for fetching user contributions
+
+var apiUrl = "https://api.github.com/users/".concat(githubUsername, "/events"); // Axios GET request to fetch user contributions
+
+axios.get(apiUrl).then(function (response) {
+  // Filter events by the date range
+  var contributions = response.data.filter(function (event) {
+    var eventDate = new Date(event.created_at);
+    return eventDate >= new Date(fromDate) && eventDate <= new Date(toDate);
+  }); // Calculate the total contributions
+
+  var totalContributions = contributions.length; // Print the total contributions
+
+  console.log("Total contributions on ".concat(fromDate, " to ").concat(toDate, ": ").concat(totalContributions));
+})["catch"](function (error) {
+  console.error("Error fetching GitHub data:", error);
 });
 var server = http.createServer(app);
 server.listen(port, "0.0.0.0", function () {

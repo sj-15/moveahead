@@ -21,7 +21,6 @@ let codeforcestoday = false;
 let githubtoday = false;
 
 app.get("/data", (req, res) => {
-  console.log("Accessing /data route");
   const data = {
     leetcodetoday,
     codeforcestoday,
@@ -66,13 +65,12 @@ app.post("/submit", async (req, res) => {
     //github
     let latestDate = new Date(0); // Initialize with a minimum date
     for (const item of github_data["data"]) {
-      const updatedAt = new Date(item.updated_at);
+      const updatedAt = new Date(item.pushed_at);
       if (updatedAt > latestDate) {
         latestDate = updatedAt;
       }
     }
-    // console.log(latestDate);
-    console.log(latestDate);
+
     githubtoday = isDateToday(latestDate);
 
     res.redirect(`/success`);
@@ -84,6 +82,39 @@ app.post("/submit", async (req, res) => {
   // Perform any processing or database storage if needed
   
 });
+
+
+// Define your GitHub username
+const githubUsername = "sj-15";
+
+// Define the date range for contributions (from and to dates)
+const fromDate = "2023-09-02T00:00:00Z";
+const toDate = "2023-09-02T23:59:59Z";
+
+// GitHub API endpoint for fetching user contributions
+const apiUrl = `https://api.github.com/users/${githubUsername}/events`;
+
+// Axios GET request to fetch user contributions
+axios.get(apiUrl)
+  .then((response) => {
+    // Filter events by the date range
+    const contributions = response.data.filter((event) => {
+      const eventDate = new Date(event.created_at);
+      return eventDate >= new Date(fromDate) && eventDate <= new Date(toDate);
+    });
+
+    // Calculate the total contributions
+    const totalContributions = contributions.length;
+
+    // Print the total contributions
+    console.log(`Total contributions on ${fromDate} to ${toDate}: ${totalContributions}`);
+  })
+  .catch((error) => {
+    console.error("Error fetching GitHub data:", error);
+  });
+
+
+
 
 var server = http.createServer(app);
 
